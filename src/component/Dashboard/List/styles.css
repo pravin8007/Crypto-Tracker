@@ -1,0 +1,85 @@
+.list-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+  cursor: pointer;
+  border-radius: 2rem;
+}
+
+.list-row:hover {
+  background-color: var(--dark-gray);
+  transition: all 0.3s;
+}
+
+.list-row td {
+  text-align: left;
+  width: 18%;
+  padding: 0 0.5rem;
+  margin: 0.8rem;
+}
+
+.td-img {
+  width: 3rem !important;
+  margin-right: 1.5rem !important;
+}
+
+.td-center-align {
+  text-align: center !important;
+}
+
+.td-right-align {
+  font-size: 1rem !important;
+  text-align: right !important;
+}
+
+.mobile-td-mkt {
+  display: none;
+}
+
+@media screen and (max-width: 1300px) {
+  .td-icon {
+    display: none;
+  }
+
+  .td-right-align {
+    font-size: 0.8rem !important;
+  }
+
+  .td-coin-symbol span {
+    display: none;
+  }
+
+}
+
+@media screen and (max-width: 1000px) {
+  .td-total-volume {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 800px) {
+
+  .td-img {
+    margin-right: 0rem !important;
+  }
+
+  .coin-logo {
+    width: 3rem !important;
+    height: 3rem !important;
+    margin-right: 0.5rem !important;
+  }
+
+  .mobile-td-mkt {
+    display: block;
+  }
+
+  .desktop-td-mkt {
+    display: none;
+  }
+
+  .coin-name {
+    font-size: 0.7rem;
+  }
+}

@@ -1,0 +1,129 @@
+.grid-item {
+  width: 320px;
+  height: 320px;
+  background-color: var(--dark-gray);
+  border-radius: 1rem;
+  border: 2px solid var(--dark-gray);
+  cursor: pointer;
+}
+
+.grid-item:hover {
+  border: 2px solid var(--green);
+  transition: all 0.3s;
+  scale: 1.02;
+}
+
+.red-item:hover {
+  border: 2px solid var(--red) !important;
+  transition: all 0.3s;
+}
+
+.info {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem;
+}
+
+.coin-logo {
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+.info-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.coin-symbol {
+  font-size: 1.2rem;
+  color: var(--white);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.coin-name {
+  color: var(--gray);
+  font-size: 0.9rem;
+  font-weight: light;
+  margin: 0;
+  text-align: left;
+}
+
+.chip-flex {
+  display: flex;
+  justify-content: flex-start;
+  gap: 1rem;
+  align-items: center;
+  margin: 1.5rem;
+}
+
+.price-chip {
+  border: 2px solid var(--green);
+  border-radius: 2rem;
+  padding: 0.5rem 1.25rem;
+  text-align: center;
+  font-weight: 600;
+  color: var(--green);
+  font-size: 1rem;
+  min-width: 64px;
+}
+
+.price-chip:hover {
+  color: var(--white);
+  background-color: var(--green);
+  transition: all 0.3s;
+}
+
+.icon-chip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 2.5rem !important;
+  height: 2.5rem !important  ;
+  border-radius: 50%;
+  color: var(--green);
+  border: 2px solid var(--green);
+}
+
+.icon-chip:hover {
+  background-color: var(--green);
+  color: var(--white);
+  transition: all 0.3s;
+}
+
+.red {
+  color: var(--red);
+  border: 2px solid var(--red);
+}
+
+.red:hover {
+  color: var(--white);
+  background-color: var(--red);
+  transition: all 0.3s;
+}
+
+.price {
+  margin: 1.5rem;
+}
+
+.price-text {
+  font-size: 1.2rem;
+  color: var(--green);
+  font-weight: 600;
+}
+
+.red-text {
+  color: var(--red);
+}
+
+.volume {
+  margin: 0.5rem 1.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #cdcdcd;
+}
