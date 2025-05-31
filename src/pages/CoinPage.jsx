@@ -8,7 +8,7 @@ function CoinPage() {
   return (
     <div>
      <Header />
-     Coin : {coinId}
+     Coin :- {coinId}
 
     </div>
   )
