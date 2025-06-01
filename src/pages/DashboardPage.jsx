@@ -60,7 +60,7 @@ function DashboardPage() {
           (
             <div className="dashboard">
               <Search search={search} onSeacrhChange={onSearchChange} />
-              <TabsComponent coins={search ? filteredCoins : paginatedCoins} clearSearch={clearSearch} />
+              <TabsComponent coins={search ? filteredCoins : paginatedCoins} search={ search ? search : ""} clearSearch={clearSearch} />
               {
                 !search && (
                   <PaginationControl page={page} handlePageChange={handlePageChange} />

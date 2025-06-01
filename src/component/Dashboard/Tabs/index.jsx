@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
@@ -9,7 +8,7 @@ import Grid from "../Grid";
 import List from "../List";
 import { Button } from "@mui/material";
 
-export default function TabsComponent({ coins, clearSearch }) {
+export default function TabsComponent({ coins, clearSearch, search }) {
     const [value, setValue] = useState("grid");
 
     const handleChange = (event, newValue) => {
@@ -38,7 +37,7 @@ export default function TabsComponent({ coins, clearSearch }) {
                         <TabPanel value="grid">
                             <div className="grid-flex">
                                 {coins.map((coin, index) => (
-                                    <Grid coin={coin} key={coin.id} index={index} />
+                                    <Grid coin={coin} key={coin.id} index={index} search={search} />
                                 ))}
                             </div>
                         </TabPanel>
@@ -46,7 +45,7 @@ export default function TabsComponent({ coins, clearSearch }) {
                             <table className="table">
                                 <tbody>
                                     {coins.map((coin, index) => (
-                                        <List coin={coin} key={coin.id} index={index} />
+                                        <List coin={coin} key={coin.id} index={index} search={search} />
                                     ))}
                                 </tbody>
                             </table>
