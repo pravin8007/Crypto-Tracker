@@ -4,7 +4,7 @@ import { motion as Motion } from "framer-motion";
 import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
 import TrendingDownRoundedIcon from "@mui/icons-material/TrendingDownRounded";
 
-function Grid({ coin,index }) {
+function Grid({ coin, index, search }) {
   const grid_item = () =>
     coin.price_change_percentage_24h > 0 ? "grid-item " : "grid-item red-item";
 
@@ -14,7 +14,7 @@ function Grid({ coin,index }) {
       key={coin.id}
       initial={{ opacity: 0, y: 100 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 , delay: 0.1 * index}}
+      transition={{ duration: 0.3, delay: search ? 0.2 : 0.1 * index }}
       whileTap={{ scale: 0.95 }}
       onClick={() => (window.location.href = `/coin/${coin.id}`)}
     >
