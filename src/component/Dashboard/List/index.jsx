@@ -12,7 +12,7 @@ function List({ coin, index , search}) {
       className="list-row"
       key={coin.id}
       onClick={() => (window.location.href = `/coin/${coin.id}`)}
-      initial={{ opacity: 0, x: -25 }}
+      initial={{ opacity: 0, x: -100 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3, delay: search ? 0.2 : 0.1 * index }}
       whileTap={{ scale: 0.95 }}
