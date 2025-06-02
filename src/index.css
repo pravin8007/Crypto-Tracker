@@ -46,3 +46,12 @@ user-select: none;
 -webkit-user-select: none;
 -ms-user-select: none;
 }
+
+.gray-wrapper{
+  display: block;
+  width: 90%;
+  background-color: var(--dark-gray);
+  margin: 1.5rem auto;
+  border-radius: 1rem;
+  padding: 0.5rem;
+}
