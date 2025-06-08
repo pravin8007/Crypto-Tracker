@@ -84,33 +84,6 @@ function CoinPage() {
     return Array.from(dateMap.values()).sort((a, b) => a[0] - b[0]);
   };
 
-  // async function getData() {
-  //   try {
-  //     const data = await getCoinData(coinId);
-  //     if (data) {
-  //       coinObject(setCoinData, data);
-
-  //       const prices = await getCoinPrices(coinId, days, priceType);
-
-  //       if (prices && Array.isArray(prices) && prices.length > 0) {
-  //         const uniquePrices = removeDuplicateDates(prices);
-
-  //         if (uniquePrices && uniquePrices.length > 0) {
-  //           settingChartData({ setChartData, prices: uniquePrices, priceType });
-
-  //         } else {
-  //           console.warn("No unique prices after filtering duplicates");
-  //         }
-  //       } else {
-  //         console.warn("No valid prices data received:", prices);
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error("Error in getData:", error);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }
 
 
   const handleDaysChange = async (event) => {
