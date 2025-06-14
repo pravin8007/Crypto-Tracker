@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
 import TrendingDownRoundedIcon from "@mui/icons-material/TrendingDownRounded";
 import "./styles.css";
@@ -6,12 +7,19 @@ import { motion as Motion } from "framer-motion";
 import { Tooltip } from "@mui/material";
 import { convertNumbers } from "../../../function/convertNumbers";
 
-function List({ coin, index , search}) {
+function List({ coin, index, search }) {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/coin/${coin.id}`);
+  };
+
   return (
     <Motion.tr
       className="list-row"
       key={coin.id}
-      onClick={() => (window.location.href = `/coin/${coin.id}`)}
+      onClick={handleClick}
+      style={{ cursor: "pointer" }}
       initial={{ opacity: 0, x: -100 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3, delay: search ? 0.2 : 0.1 * index }}
@@ -52,8 +60,11 @@ function List({ coin, index , search}) {
         ) : (
           <td className="chip-flex">
             <div className="price-chip red price-change">
-              {coin.price_change_percentage_24h.toFixed(2)} %
+              {coin?.price_change_percentage_24h != null
+                ? coin.price_change_percentage_24h.toFixed(2) + " %"
+                : "N/A"}
             </div>
+
             <div className="icon-chip red td-icon">
               <TrendingDownRoundedIcon />
             </div>
@@ -76,6 +87,7 @@ function List({ coin, index , search}) {
           </h3>
         </Tooltip>
       </td>
+
       <Tooltip title="Total Volume" placement="top" arrow>
         <td>
           <p className="volume td-right-align td-total-volume">

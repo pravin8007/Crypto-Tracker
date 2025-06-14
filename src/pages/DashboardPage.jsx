@@ -3,9 +3,9 @@ import Header from '../component/Common/Header';
 import TabsComponent from '../component/Dashboard/Tabs';
 import Search from "../component/Dashboard/Search"
 import Loader from '../component/Common/Loader';
-import axios from 'axios';
 import PaginationControl from '../component/Dashboard/Pagination';
 import BackToTop from '../component/Common/backToTop';
+import { get100coins } from '../function/get100Coins';
 
 
 function DashboardPage() {
@@ -36,19 +36,18 @@ function DashboardPage() {
   }
 
   useEffect(() => {
-    axios
-      .get('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false')
-      .then((response) => {
-        console.log(response.data);
-        setCoins(response.data);
-        setLoading(false);
-        setPaginatedCoins(response.data.slice(0, 10));
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-        setLoading(true);
-      });
+    getData();
   }, []);
+
+  const getData = async () => {
+    const myCoins = await get100coins();
+    if (myCoins) {
+      setCoins(myCoins);
+      setLoading(false);
+      setPaginatedCoins(myCoins.slice(0, 10));
+    }
+
+  }
 
   return (
     <div>
@@ -60,13 +59,13 @@ function DashboardPage() {
           (
             <div className="dashboard">
               <Search search={search} onSeacrhChange={onSearchChange} />
-              <TabsComponent coins={search ? filteredCoins : paginatedCoins} search={ search ? search : ""} clearSearch={clearSearch} />
+              <TabsComponent coins={search ? filteredCoins : paginatedCoins} search={search ? search : ""} clearSearch={clearSearch} />
               {
                 !search && (
                   <PaginationControl page={page} handlePageChange={handlePageChange} />
                 )
               }
-               <BackToTop />
+              <BackToTop />
             </div>
           )
       }

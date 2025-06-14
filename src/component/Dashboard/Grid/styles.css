@@ -125,5 +125,5 @@
   margin: 0.5rem 1.5rem;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #cdcdcd;
+  color: var(--gray);
 }

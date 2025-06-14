@@ -1,28 +1,49 @@
 import { ConvertDate } from "./convertDate";
 
-export const settingChartData = ({ setChartData, prices, priceType }) => {
-  if (!prices?.length) return;
-  
+export const settingChartData = ({ setChartData, prices1, prices2 }) => {
+  if (!Array.isArray(prices1) || prices1.length === 0) {
+    console.error("Invalid prices1 data:", prices1);
+    setChartData({ labels: [], datasets: [] });
+    return;
+  }
 
-  const colors = {
-    prices: { border: "#3a80e9", bg: "rgba(62,135,195,0.1)", label: "Price" },
-    market_caps: { border: "#f1c40f", bg: "rgba(241,196,15,0.1)", label: "Market Cap" },
-    total_volumes: { border: "#e94343", bg: "rgba(233,67,67,0.1)", label: "Total Volume" },
-  };
+  if (prices2 && (!Array.isArray(prices2) || prices2.length === 0)) {
+    console.error("Invalid prices2 data:", prices2);
+    setChartData({ labels: [], datasets: [] });
+    return;
+  }
 
-  const { border, bg, label } = colors[priceType] || colors.prices;
+  const labels = prices1.map(([timestamp]) => ConvertDate(timestamp));
 
-  setChartData({
-    labels: prices.map(p => ConvertDate(p[0])),
-    datasets: [{
-      label,
-      data: prices.map(price => price[1]),
-      borderColor: border,
-      backgroundColor: bg,
+  const datasets = [
+    {
+      label: "Crypto1",
+      data: prices1.map(([, price]) => price),
+      borderColor: "#3a80e9",
+      backgroundColor: prices2 ? undefined : "rgba(62,135,195,0.1)",
       borderWidth: 2,
-      fill: true,
+      fill: !prices2,
       tension: 0.25,
       pointRadius: 1,
-    }],
+      yAxisID: "crypto1",
+    },
+  ];
+
+  if (prices2) {
+    datasets.push({
+      label: "Crypto2",
+      data: prices2.map(([, price]) => price),
+      borderColor: "#6ac96f",
+      borderWidth: 2,
+      fill: false,
+      tension: 0.25,
+      pointRadius: 1,
+      yAxisID: "crypto2",
+    });
+  }
+
+  setChartData({
+    labels,
+    datasets,
   });
 };

@@ -39,9 +39,22 @@ function MainComponent() {
                     initial={{ opacity: 0, scale: 0.5, x: 50 }}
                     animate={{ opacity: 1, scale: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: 1 }}>
-                    <Link to="/dashboard" className="navigate"> 
-                    <Button text={"Dashboard"} />
+                    <Link to="/dashboard" className="navigate">
+                        <Button text={"Dashboard"} />
                     </Link>
+
+                    {/* <RWebShare
+                        data={{
+                            text: "CryptoTracker made by Pravin Patil using React JS.",
+                            url: "https://crypto-insight-vaibhavmali.netlify.app/",
+                            title: "CryptoTracker.",
+                        }}
+                        onClick={() => toast.info("App Shared!")}
+                    >
+                        <Button text={"Share App"} outline={true} />
+                    </RWebShare> */}
+
+
                     <Button text={"Share"} outline={true} />
                 </motion.div>
             </div>
@@ -52,7 +65,7 @@ function MainComponent() {
                     className="iphone"
                     initial={{ y: -20 }}
                     animate={{ y: 20 }}
-                    transition={{ duration: 2, repeat: Infinity, repeatType: "mirror",  ease: "linear"  }}
+                    transition={{ duration: 2, repeat: Infinity, repeatType: "mirror", ease: "linear" }}
                     alt="iphone"
                 />
                 <img src={gradient} className="gradient" />

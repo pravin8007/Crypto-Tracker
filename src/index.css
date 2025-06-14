@@ -16,7 +16,7 @@ body {
   background-color: var(--black);
   color: var(--white);
   font-family: "Inter", sans-serif;
-  overflow-x:hidden
+  overflow-x: hidden;
 }
 
 ::selection {
@@ -41,14 +41,14 @@ body {
 }
 
 img {
--webkit-user-drag: none;
-user-select: none;
--moz-user-select: none;
--webkit-user-select: none;
--ms-user-select: none;
+  -webkit-user-drag: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 
-.gray-wrapper{
+.gray-wrapper {
   display: block;
   width: 90%;
   background-color: var(--dark-gray);
@@ -58,7 +58,17 @@ user-select: none;
   overflow: hidden;
 }
 
-.gray-wrapper table{
+.gray-wrapper table {
   width: 100%;
   overflow: hidden !important;
 }
+
+.coin-days-flex {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 1rem;
+  gap: 2rem;
+}
+

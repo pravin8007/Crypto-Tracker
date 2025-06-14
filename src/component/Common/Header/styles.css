@@ -73,7 +73,7 @@
     flex-direction: column;
     gap: 1rem;
     padding: 20px 15px 15px 0px;
-    background-color: #111111;
+    background-color: var(--dark-gray);
     z-index: 1000;
   }
 }
