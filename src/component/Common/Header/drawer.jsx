@@ -18,6 +18,7 @@ export default function AnchorTemporaryDrawer() {
                 <div className="drawer-div">
                     <Link to="/" className='link'>Home</Link>
                     <Link to="/compare" className='link'>Compare</Link>
+                     <Link to="/watchList" className='link'>WatchList</Link>
                     <Link to="/dashboard" className='link' >Dashboard</Link>
                    <div className='toggle-btn'> <ThemeToggleButton /></div>
                 </div>

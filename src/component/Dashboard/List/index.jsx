@@ -1,14 +1,37 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
-import TrendingDownRoundedIcon from "@mui/icons-material/TrendingDownRounded";
-import "./styles.css";
 import { motion as Motion } from "framer-motion";
 import { Tooltip } from "@mui/material";
+import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
+import TrendingDownRoundedIcon from "@mui/icons-material/TrendingDownRounded";
+import StarOutlineIcon from "@mui/icons-material/StarOutline";
+import StarIcon from "@mui/icons-material/Star";
+import "./styles.css";
 import { convertNumbers } from "../../../function/convertNumbers";
+import { saveItemToWatchlist } from "../../../function/saveItemToWatchList";
+import { removeItemFromWatchList } from "../../../function/removeItemFRomWatchList";
+
 
 function List({ coin, index, search }) {
   const navigate = useNavigate();
+  const [isCoinAdded, setIsCoinAdded] = useState(false);
+
+  useEffect(() => {
+    const watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+    setIsCoinAdded(watchlist.includes(coin.id));
+  }, [coin.id]);
+
+  const handleWatchlistToggle = (e) => {
+    e.stopPropagation();
+    if (isCoinAdded) {
+      removeItemFromWatchList(e, coin.id, setIsCoinAdded);
+    } else {
+      setIsCoinAdded(true);
+      saveItemToWatchlist(e, coin.id);
+    }
+  };
+
+  const isPositive = coin.price_change_percentage_24h >= 0;
 
   const handleClick = () => {
     navigate(`/coin/${coin.id}`);
@@ -17,7 +40,6 @@ function List({ coin, index, search }) {
   return (
     <Motion.tr
       className="list-row"
-      key={coin.id}
       onClick={handleClick}
       style={{ cursor: "pointer" }}
       initial={{ opacity: 0, x: -100 }}
@@ -25,70 +47,51 @@ function List({ coin, index, search }) {
       transition={{ duration: 0.3, delay: search ? 0.2 : 0.1 * index }}
       whileTap={{ scale: 0.95 }}
     >
-      <Tooltip title={coin.name} placement="top-start" arrow>
+
+      <Tooltip title={coin.name} arrow>
         <td className="td-img">
-          <img
-            src={coin.image}
-            alt={`Logo of ${coin.name}`}
-            className="coin-logo"
-          />
+          <img src={coin.image} alt={coin.name} className="coin-logo" />
         </td>
       </Tooltip>
+
       <td>
         <div className="info-text">
-          <Tooltip title="Symbol" placement="top" arrow>
+          <Tooltip title="Symbol" arrow>
             <p className="coin-symbol td-coin-symbol">
-              {coin.symbol} <span>-USD</span>
+              {coin.symbol.toUpperCase()} <span>-USD</span>
             </p>
           </Tooltip>
-          <Tooltip title="Name" placement="bottom" arrow>
+          <Tooltip title="Name" arrow>
             <p className="coin-name">{coin.name}</p>
           </Tooltip>
         </div>
       </td>
 
-      <Tooltip title="Price Change In 24Hrs" placement="top" arrow>
-        {coin.price_change_percentage_24h > 0 ? (
-          <td className="chip-flex">
-            <div className="price-chip">
-              {coin.price_change_percentage_24h.toFixed(2)}%
-            </div>
-            <div className="icon-chip td-icon">
-              <TrendingUpRoundedIcon />
-            </div>
-          </td>
-        ) : (
-          <td className="chip-flex">
-            <div className="price-chip red price-change">
-              {coin?.price_change_percentage_24h != null
-                ? coin.price_change_percentage_24h.toFixed(2) + " %"
-                : "N/A"}
-            </div>
-
-            <div className="icon-chip red td-icon">
-              <TrendingDownRoundedIcon />
-            </div>
-          </td>
-        )}
+      <Tooltip title="Price Change (24h)" arrow>
+        <td className="chip-flex">
+          <div className={`price-chip ${!isPositive && "red"}`}>
+            {coin?.price_change_percentage_24h != null
+              ? coin.price_change_percentage_24h.toFixed(2) + " %"
+              : "N/A"}
+          </div>
+          <div className={`icon-chip td-icon ${!isPositive && "red"}`}>
+            {isPositive ? <TrendingUpRoundedIcon /> : <TrendingDownRoundedIcon />}
+          </div>
+        </td>
       </Tooltip>
 
-      <td className="price">
-        <Tooltip title="Current Price" placement="top" arrow>
+      <Tooltip title="Current Price" arrow>
+        <td className="price">
           <h3
             className="price-text td-center-align"
-            style={{
-              color:
-                coin.price_change_percentage_24h > 0
-                  ? `var(--green)`
-                  : `var(--red)`,
-            }}
+            style={{ color: isPositive ? "var(--green)" : "var(--red)" }}
           >
             ${coin.current_price.toLocaleString()}
           </h3>
-        </Tooltip>
-      </td>
+        </td>
+      </Tooltip>
 
-      <Tooltip title="Total Volume" placement="top" arrow>
+      <Tooltip title="Total Volume" arrow>
         <td>
           <p className="volume td-right-align td-total-volume">
             ${coin.total_volume.toLocaleString()}
@@ -96,7 +99,7 @@ function List({ coin, index, search }) {
         </td>
       </Tooltip>
 
-      <Tooltip title="Market Cap" placement="top" arrow>
+      <Tooltip title="Market Cap" arrow>
         <td className="desktop-td-mkt">
           <p className="volume td-right-align market-cap">
             ${coin.market_cap.toLocaleString()}
@@ -104,13 +107,23 @@ function List({ coin, index, search }) {
         </td>
       </Tooltip>
 
-      <Tooltip title="Market Cap" placement="top" arrow>
+      <Tooltip title="Market Cap" arrow>
         <td className="mobile-td-mkt">
           <p className="volume td-right-align market-cap">
             ${convertNumbers(coin.market_cap)}
           </p>
         </td>
       </Tooltip>
+
+       <td>
+        <span className="watchlist-icon" onClick={handleWatchlistToggle}>
+            {isCoinAdded ? (
+              <StarIcon style={{ color: "#facc15" }} />
+            ) : (
+              <StarOutlineIcon />
+            )}
+          </span>
+      </td>
     </Motion.tr>
   );
 }

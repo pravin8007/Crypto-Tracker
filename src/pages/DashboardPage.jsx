@@ -6,6 +6,7 @@ import Loader from '../component/Common/Loader';
 import PaginationControl from '../component/Dashboard/Pagination';
 import BackToTop from '../component/Common/backToTop';
 import { get100coins } from '../function/get100Coins';
+import Footer from '../component/Common/Footer';
 
 
 function DashboardPage() {
@@ -69,6 +70,7 @@ function DashboardPage() {
             </div>
           )
       }
+      <Footer />
     </div>
   )
 }

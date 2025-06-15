@@ -15,6 +15,7 @@ function Header() {
         <div className='toggle-btn'><ThemeToggleButton /></div>
         <Link to="/" className='link'>Home</Link>
         <Link to="/compare" className='link'>Compare</Link>
+        <Link to="/watchList" className='link'>WatchList</Link>
         <Link to="/dashboard" className='link'>
           <Button text={"Dashboard"} />
         </Link>

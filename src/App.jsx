@@ -7,6 +7,7 @@ import ComparePage from './pages/ComparePage';
 import DashboardPage from './pages/DashboardPage';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Watchlist from './pages/WatchList';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/coin/:coinId" element={<CoinPage />} />
           <Route path="/compare" element={<ComparePage />} />
+           <Route path="/watchList" element={<Watchlist />} />
         </Routes>
       </BrowserRouter>
       <ToastContainer position="top-right" />

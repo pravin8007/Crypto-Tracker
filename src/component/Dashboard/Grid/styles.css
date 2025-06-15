@@ -27,6 +27,18 @@
   margin: 1.5rem;
 }
 
+.watchlist-icon{
+   display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 2.5rem !important;
+  height: 2.5rem !important  ;
+  border-radius: 50%;
+  color: var(--green);
+  border: 2px solid var(--green);
+  margin: auto;
+}
+
 .coin-logo {
   width: 3.5rem;
   height: 3.5rem;
