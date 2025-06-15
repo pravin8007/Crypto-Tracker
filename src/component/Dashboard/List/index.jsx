@@ -9,7 +9,7 @@ import StarIcon from "@mui/icons-material/Star";
 import "./styles.css";
 import { convertNumbers } from "../../../function/convertNumbers";
 import { saveItemToWatchlist } from "../../../function/saveItemToWatchList";
-import { removeItemFromWatchList } from "../../../function/removeItemFromWatchList";
+import { removeFromWatchList } from "../../../function/removeFromWatchList";
 
 
 function List({ coin, index, search }) {
@@ -24,7 +24,7 @@ function List({ coin, index, search }) {
   const handleWatchlistToggle = (e) => {
     e.stopPropagation();
     if (isCoinAdded) {
-      removeItemFromWatchList(e, coin.id, setIsCoinAdded);
+      removeFromWatchList(e, coin.id, setIsCoinAdded);
     } else {
       setIsCoinAdded(true);
       saveItemToWatchlist(e, coin.id);
@@ -115,14 +115,14 @@ function List({ coin, index, search }) {
         </td>
       </Tooltip>
 
-       <td>
+      <td>
         <span className="watchlist-icon" onClick={handleWatchlistToggle}>
-            {isCoinAdded ? (
-              <StarIcon style={{ color: "#facc15" }} />
-            ) : (
-              <StarOutlineIcon />
-            )}
-          </span>
+          {isCoinAdded ? (
+            <StarIcon style={{ color: "#facc15" }} />
+          ) : (
+            <StarOutlineIcon />
+          )}
+        </span>
       </td>
     </Motion.tr>
   );

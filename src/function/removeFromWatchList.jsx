@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 
-export const removeItemFromWatchList = (e, id, setIsCoinAdded) => {
+export const removeFromWatchList = (e, id, setIsCoinAdded) => {
   e.preventDefault();
   if (window.confirm("Are you sure you want to remove this coin?")) {
     let watchlist = JSON.parse(localStorage.getItem("watchlist"));

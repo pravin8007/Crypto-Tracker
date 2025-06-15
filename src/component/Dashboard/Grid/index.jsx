@@ -7,7 +7,8 @@ import StarOutlineIcon from "@mui/icons-material/StarOutline";
 import StarIcon from "@mui/icons-material/Star";
 import { Link } from "react-router-dom";
 import { saveItemToWatchlist } from "../../../function/saveItemToWatchList";
-import { removeItemFromWatchList } from "../../../function/removeItemFromWatchList";
+import { removeFromWatchList } from "../../../function/removeFromWatchList"; 
+
 
 
 function Grid({ coin, index, search }) {
@@ -20,7 +21,7 @@ function Grid({ coin, index, search }) {
   const handleWatchlistToggle = (e) => {
     e.preventDefault(); 
     if (isCoinAdded) {
-      removeItemFromWatchList(e, coin.id, setIsCoinAdded);
+      removeFromWatchList(e, coin.id, setIsCoinAdded);
     } else {
       setIsCoinAdded(true);
       saveItemToWatchlist(e, coin.id);
