@@ -51,10 +51,19 @@ function MainComponent() {
                             url: "https://crypto-tracker-beryl-chi.vercel.app/",
                             title: "CryptoTracker.",
                         }}
-                        onClick={() => toast.info("App Shared!")}
                     >
-                        <Button text={"Share"} outline={true} />
+                        {(handleShare) => (
+                            <Button
+                                text={"Share App"}
+                                outline={true}
+                                onClick={() => {
+                                    handleShare();
+                                    toast.info("App Shared!");
+                                }}
+                            />
+                        )}
                     </RWebShare>
+
                 </motion.div>
             </div>
 
