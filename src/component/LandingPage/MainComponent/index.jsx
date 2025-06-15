@@ -6,6 +6,7 @@ import gradient from "../../../assets/gradient.png";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function MainComponent() {
     return (
@@ -43,16 +44,16 @@ function MainComponent() {
                         <Button text={"Dashboard"} />
                     </Link>
 
-                    {/* <RWebShare
+                    <RWebShare
                         data={{
                             text: "CryptoTracker made by Pravin Patil using React JS.",
-                            url: "https://crypto-insight-vaibhavmali.netlify.app/",
+                            url: "https://crypto-tracker-beryl-chi.vercel.app/",
                             title: "CryptoTracker.",
                         }}
                         onClick={() => toast.info("App Shared!")}
                     >
                         <Button text={"Share App"} outline={true} />
-                    </RWebShare> */}
+                    </RWebShare>
 
 
                     <Button text={"Share"} outline={true} />
