@@ -55,9 +55,6 @@ function MainComponent() {
                     >
                         <Button text={"Share App"} outline={true} />
                     </RWebShare>
-
-
-                    <Button text={"Share"} outline={true} />
                 </motion.div>
             </div>
 
