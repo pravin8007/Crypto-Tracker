@@ -53,7 +53,7 @@ function MainComponent() {
                         }}
                         onClick={() => toast.info("App Shared!")}
                     >
-                        <Button text={"Share App"} outline={true} />
+                        <Button text={"Share"} outline={true} />
                     </RWebShare>
                 </motion.div>
             </div>
