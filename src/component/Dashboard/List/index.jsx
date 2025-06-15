@@ -9,7 +9,7 @@ import StarIcon from "@mui/icons-material/Star";
 import "./styles.css";
 import { convertNumbers } from "../../../function/convertNumbers";
 import { saveItemToWatchlist } from "../../../function/saveItemToWatchList";
-import { removeItemFromWatchList } from "../../../function/removeItemFRomWatchList";
+import { removeItemFromWatchList } from "../../../function/removeItemFromWatchList";
 
 
 function List({ coin, index, search }) {
