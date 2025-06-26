@@ -116,13 +116,13 @@ function List({ coin, index, search }) {
       </Tooltip>
 
       <td>
-        <span className="watchlist-icon" onClick={handleWatchlistToggle}>
-          {isCoinAdded ? (
-            <StarIcon style={{ color: "#facc15" }} />
-          ) : (
-            <StarOutlineIcon />
-          )}
-        </span>
+        <div
+          className={`watchlist-icon ${coin.price_change_percentage_24h < 0 ? "red" : ""
+            }`}
+          onClick={handleWatchlistToggle}
+        >
+          {isCoinAdded ? <StarIcon /> : <StarOutlineIcon />}
+        </div>
       </td>
     </Motion.tr>
   );
