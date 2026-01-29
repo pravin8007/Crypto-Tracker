@@ -1,21 +1,40 @@
 import axios from "axios";
 
-export const getCoinPrices = async (coinId, days, priceType = "prices") => {
-  try {
-    const url = `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}&interval=daily`;
+const API_BASE_URL = "https://api.coingecko.com/api/v3";
+const VALID_PRICE_TYPES = ["prices", "market_caps", "total_volumes"];
 
-    const response = await axios.get(url);
+export const getCoinPrices = async (coinId, days, priceType = "prices") => {
+  if (!coinId || !days) {
+    console.warn("getCoinPrices: missing coinId or days");
+    return [];
+  }
+
+  if (!VALID_PRICE_TYPES.includes(priceType)) {
+    console.warn(`Invalid priceType: ${priceType}`);
+    return [];
+  }
+
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/coins/${coinId}/market_chart`,
+      {
+        params: {
+          vs_currency: "usd",
+          days,
+          interval: "daily",
+        },
+        timeout: 10000,
+      },
+    );
 
     const data = response?.data?.[priceType];
 
-    if (!Array.isArray(data)) {
-      console.warn(`Invalid data format for ${priceType}`, data);
-      return [];
-    }
-
-    return data;
+    return Array.isArray(data) ? data : [];
   } catch (error) {
-    console.error("Error fetching prices:", error);
+    console.error(
+      `Error fetching ${priceType} for ${coinId} (${days} days):`,
+      error?.response?.status || error.message,
+    );
     return [];
   }
 };

@@ -17,7 +17,7 @@ function BackToTop() {
 
     window.addEventListener('scroll', scrollFunction);
 
-    return () => {
+    return () => { 
       window.removeEventListener('scroll', scrollFunction);
     };
   }, []);
