@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useTransition } from "react"; // ✅ import
 import { useParams } from "react-router-dom";
 
 import Header from "../component/Common/Header";
@@ -23,6 +23,8 @@ function CoinPage() {
   const [days, setDays] = useState(30);
   const [priceType, setPriceType] = useState("prices");
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
+
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     let isMounted = true;
@@ -68,61 +70,59 @@ function CoinPage() {
 
   const removeDuplicateDates = (prices) => {
     if (!prices || !Array.isArray(prices)) return [];
-
     const dateMap = new Map();
-
     prices.forEach((price) => {
       const dateStr = ConvertDate(price[0]);
       const timestamp = price[0];
-
       if (!dateMap.has(dateStr) || timestamp > dateMap.get(dateStr)[0]) {
         dateMap.set(dateStr, price);
       }
     });
-
     return Array.from(dateMap.values()).sort((a, b) => a[0] - b[0]);
   };
 
   const handleDaysChange = async (event) => {
     const selectedDays = event.target.value;
     setDays(selectedDays);
-    setIsLoading(true);
 
-    try {
-      const prices = await getCoinPrices(coinId, selectedDays, priceType);
-      const uniquePrices = removeDuplicateDates(prices);
-
-      if (uniquePrices.length > 0) {
-        settingChartData({ setChartData, prices1: uniquePrices });
-      } else {
-        console.warn("No unique prices after filtering");
+    startTransition(async () => { 
+      setIsLoading(true);
+      try {
+        const prices = await getCoinPrices(coinId, selectedDays, priceType);
+        const uniquePrices = removeDuplicateDates(prices);
+        if (uniquePrices.length > 0) {
+          settingChartData({ setChartData, prices1: uniquePrices });
+        } else {
+          console.warn("No unique prices after filtering");
+        }
+      } catch (error) {
+        console.error("Error in handleDaysChange:", error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Error in handleDaysChange:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    });
   };
 
   const handlePriceTypeChange = async (event, newType) => {
     if (newType) {
-      setPriceType(newType);
-      setIsLoading(true);
+      setPriceType(newType); 
 
-      try {
-        const prices = await getCoinPrices(coinId, days, newType);
-        const uniquePrices = removeDuplicateDates(prices);
-
-        if (uniquePrices.length > 0) {
-          settingChartData({ setChartData, prices1: uniquePrices });
-        } else {
-          console.warn("No unique prices for selected price type");
+      startTransition(async () => {
+        setIsLoading(true);
+        try {
+          const prices = await getCoinPrices(coinId, days, newType);
+          const uniquePrices = removeDuplicateDates(prices);
+          if (uniquePrices.length > 0) {
+            settingChartData({ setChartData, prices1: uniquePrices });
+          } else {
+            console.warn("No unique prices for selected price type");
+          }
+        } catch (error) {
+          console.error("Error in handlePriceTypeChange:", error);
+        } finally {
+          setIsLoading(false);
         }
-      } catch (error) {
-        console.error("Error in handlePriceTypeChange:", error);
-      } finally {
-        setIsLoading(false);
-      }
+      });
     }
   };
 
@@ -144,7 +144,12 @@ function CoinPage() {
           <div className="gray-wrapper">
             <SelectDays days={days} handleDaysChange={handleDaysChange} />
             <Pricetype priceType={priceType} handlePriceTypeChange={handlePriceTypeChange} />
-            <LineChart chartData={chartData} multiAxis={false} />
+
+            {isPending ? (
+              <Loader />
+            ) : (
+              <LineChart chartData={chartData} multiAxis={false} />
+            )}
           </div>
 
           <CoinInfo heading={coinData.name} desc={coinData.desc} />
