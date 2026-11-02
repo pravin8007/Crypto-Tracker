@@ -24,7 +24,7 @@ function CoinPage() {
   const [priceType, setPriceType] = useState("prices");
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
 
-  const [isPending, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition(); 
 
   useEffect(() => {
     let isMounted = true;

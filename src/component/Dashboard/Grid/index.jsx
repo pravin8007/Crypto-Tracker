@@ -62,7 +62,7 @@ function Grid({ coin, index, search }) {
               coin.price_change_percentage_24h < 0 ? "red" : ""
             }`}
           >
-            {coin.price_change_percentage_24h.toFixed(2)}%
+          {(coin.price_change_percentage_24h ?? 0).toFixed(2)}%
           </div>
           <div
             className={`icon-chip ${
