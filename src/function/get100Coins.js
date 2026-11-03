@@ -1,72 +1,80 @@
+
 import axios from "axios";
 
-const API_BASE_URL = "https://api.coingecko.com/api/v3";
-
 let cachedCoins = null;
-let lastFetchTime = 0;
+let cachedTimestamp = 0;
+let fetchPromise = null;
 
-const CACHE_DURATION = 60_000;
-const MAX_RETRIES = 3;
+export const CACHE_DURATION = 60 * 5 * 1000; // 
+const STORAGE_KEY = "crypto-tracker:coins";
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const readStoredCoins = () => {
+  try {
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (
+      stored &&
+      Array.isArray(stored.data) &&
+      Date.now() - stored.timestamp < CACHE_DURATION
+    ) {
+      return stored.data;
+    }
+  } catch (error) {
+    console.warn("Unable to read cached coin data:", error);
+  }
+  return null;
+};
 
 export const get100coins = async () => {
-  const now = Date.now();
-
-  if (cachedCoins && now - lastFetchTime < CACHE_DURATION) {
+  if (cachedCoins && Date.now() - cachedTimestamp < CACHE_DURATION) {
     return cachedCoins;
   }
 
-  let retries = MAX_RETRIES;
-  let delayTime = 1000;
-
-  while (retries > 0) {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/coins/markets`, {
-        params: {
-          vs_currency: "usd",
-          order: "market_cap_desc",
-          per_page: 100,
-          page: 1,
-          sparkline: false,
-
-          // ✅ REQUIRED for Feb 2026
-          include_rehypothecated: true,
-        },
-        timeout: 5000,
-      });
-
-      if (!Array.isArray(response.data)) {
-        console.warn("Invalid coins response format");
-        return [];
-      }
-
-      // ✅ Normalize market cap rank safely
-      cachedCoins = response.data.map((coin) => ({
-        ...coin,
-        market_cap_rank:
-          coin.market_cap_rank_with_rehypothecated ??
-          coin.market_cap_rank ??
-          null,
-      }));
-
-      lastFetchTime = Date.now();
-      return cachedCoins;
-    } catch (error) {
-      if (error.response?.status === 429 && retries > 1) {
-        console.warn(`Rate limit hit. Retrying in ${delayTime}ms...`);
-        await delay(delayTime);
-        delayTime *= 2;
-        retries--;
-      } else {
-        console.error(
-          "Error fetching coins:",
-          error?.response?.status || error.message,
-        );
-        return [];
-      }
-    }
+  const storedCoins = readStoredCoins();
+  if (storedCoins) {
+    cachedCoins = storedCoins;
+    cachedTimestamp = Date.now();
+    return cachedCoins;
   }
 
-  return [];
+  if (!fetchPromise) {
+    fetchPromise = axios
+      .get("/api/coins", { timeout: 15000 })
+      .then((response) => {
+        if (!Array.isArray(response.data)) {
+          throw new Error("Invalid coins response format");
+        }
+
+        cachedCoins = response.data.map((coin) => ({
+          ...coin,
+          market_cap_rank:
+            coin.market_cap_rank_with_rehypothecated ??
+            coin.market_cap_rank ??
+            null,
+        }));
+        cachedTimestamp = Date.now();
+
+        try {
+          localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify({ timestamp: Date.now(), data: cachedCoins })
+          );
+        } catch (error) {
+          console.warn("Unable to cache coin data:", error);
+        }
+
+        return cachedCoins;
+      })
+      .catch((error) => {
+        console.error(
+          "Error fetching coins:",
+          error.response?.status || error.message
+        );
+        return [];
+      })
+      .finally(() => {
+        fetchPromise = null;
+      });
+  }
+
+  return fetchPromise;
 };

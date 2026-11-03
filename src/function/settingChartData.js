@@ -1,4 +1,4 @@
-import { ConvertDate } from "./convertDate";
+import { ConvertDate } from "./convertDate.js";
 
 export const settingChartData = ({ setChartData, prices1, prices2 }) => {
   if (!Array.isArray(prices1) || prices1.length === 0) {
@@ -13,12 +13,26 @@ export const settingChartData = ({ setChartData, prices1, prices2 }) => {
     return;
   }
 
-  const labels = prices1.map(([timestamp]) => ConvertDate(timestamp));
+  const timestamps = [
+    ...new Set([
+      ...prices1.map(([timestamp]) => timestamp),
+      ...(prices2 || []).map(([timestamp]) => timestamp),
+    ]),
+  ].sort((a, b) => a - b);
+  const labels = timestamps.map((timestamp) => ConvertDate(timestamp));
+  const prices1ByTimestamp = new Map(
+    prices1.map(([timestamp, value]) => [timestamp, value])
+  );
+  const prices2ByTimestamp = prices2
+    ? new Map(prices2.map(([timestamp, value]) => [timestamp, value]))
+    : null;
 
   const datasets = [
     {
       label: "Crypto1",
-      data: prices1.map(([, price]) => price),
+      data: timestamps.map((timestamp) =>
+        prices1ByTimestamp.get(timestamp) ?? null
+      ),
       borderColor: "#3a80e9",
       backgroundColor: prices2 ? undefined : "rgba(62,135,195,0.1)",
       borderWidth: 2,
@@ -32,7 +46,9 @@ export const settingChartData = ({ setChartData, prices1, prices2 }) => {
   if (prices2) {
     datasets.push({
       label: "Crypto2",
-      data: prices2.map(([, price]) => price),
+      data: timestamps.map((timestamp) =>
+        prices2ByTimestamp.get(timestamp) ?? null
+      ),
       borderColor: "#6ac96f",
       borderWidth: 2,
       fill: false,

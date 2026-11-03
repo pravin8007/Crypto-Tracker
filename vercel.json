@@ -1,5 +1,8 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
+    { "source": "/dashboard", "destination": "/" },
+    { "source": "/compare", "destination": "/" },
+    { "source": "/watchList", "destination": "/" },
+    { "source": "/coin/:coinId", "destination": "/" }
   ]
 }

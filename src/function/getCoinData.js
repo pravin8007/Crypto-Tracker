@@ -1,71 +1,100 @@
-import axios from "axios";
 
-const API_BASE_URL = "https://api.coingecko.com/api/v3";
+import axios from "axios";
+import { get100coins, CACHE_DURATION } from "./get100Coins";
 
 const coinDataCache = {};
-const CACHE_DURATION = 60000;  
+const STORAGE_PREFIX = "crypto-tracker:details:";
 
-const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+const readStoredDetails = (coinId) => {
+  try {
+    const stored = JSON.parse(
+      localStorage.getItem(`${STORAGE_PREFIX}${coinId}`)
+    );
+    if (stored && Date.now() - stored.timestamp < CACHE_DURATION) {
+      return stored.data;
+    }
+  } catch (error) {
+    console.warn("Unable to read cached coin details:", error);
+  }
+  return null;
+};
+
+const cacheDetails = (coinId, data) => {
+  coinDataCache[coinId] = { data, timestamp: Date.now() };
+  try {
+    localStorage.setItem(
+      `${STORAGE_PREFIX}${coinId}`,
+      JSON.stringify({ timestamp: Date.now(), data })
+    );
+  } catch (error) {
+    console.warn("Unable to cache coin details:", error);
+  }
+};
 
 export const getCoinData = async (coinId) => {
-  if (!coinId) {
-    console.warn("getCoinData called without coinId");
-    return null;
-  }
+  if (!coinId) return null;
 
-  const cacheKey = coinId;
   const now = Date.now();
 
   if (
-    coinDataCache[cacheKey] &&
-    now - coinDataCache[cacheKey].timestamp < CACHE_DURATION
+    coinDataCache[coinId] &&
+    now - coinDataCache[coinId].timestamp < CACHE_DURATION
   ) {
-    return coinDataCache[cacheKey].data;
+    return coinDataCache[coinId].data;
   }
 
-  let retries = 3;
-  let delayTime = 1000;
+  const storedDetails = readStoredDetails(coinId);
+  if (storedDetails) {
+    coinDataCache[coinId] = { data: storedDetails, timestamp: now };
+    return storedDetails;
+  }
 
-  while (retries > 0) {
+  try {
+    const response = await axios.get("/api/coin-details", {
+      params: { id: coinId, localization: false },
+      timeout: 15000,
+    });
+
+    const data = response.data;
+
+    if (!data || typeof data !== "object" || !data.id || !data.name) {
+      throw new Error("Invalid coin details response");
+    }
+
+    const normalizedData = {
+      ...data,
+      market_cap_rank:
+        data.market_cap_rank_with_rehypothecated ??
+        data.market_cap_rank ??
+        null,
+    };
+
+    cacheDetails(coinId, normalizedData);
+
+    return normalizedData;
+  } catch (error) {
+    console.error(
+      `Error fetching coin data (${coinId}):`,
+      error.response?.status || error.message
+    );
+
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/coins/${coinId}`,
-        {
-          timeout: 5000, 
-        }
+      const coins = await get100coins();
+      const fallbackCoin = coins.find(
+        (coin) => coin.id === coinId
       );
 
-      const data = response.data;
-
-      // ✅ Normalize market cap rank (Feb 2026 safe)
-      const normalizedData = {
-        ...data,
-        market_cap_rank:
-          data.market_cap_rank_with_rehypothecated ??
-          data.market_cap_rank ??
-          null,
-      };
-
-      coinDataCache[cacheKey] = {
-        data: normalizedData,
-        timestamp: Date.now(),
-      };
-
-      return normalizedData;
-    } catch (error) {
-      if (error.response?.status === 429 && retries > 1) {
-        await delay(delayTime);
-        retries--;
-        delayTime *= 2;
-      } else {
-        console.error(
-          `Error fetching coin data (${coinId}):`,
-          error?.response?.status || error.message
-        );
-        return null;
+      if (fallbackCoin) {
+        cacheDetails(coinId, fallbackCoin);
+        return fallbackCoin;
       }
+    } catch (fallbackError) {
+      console.error(
+        `Fallback coin data request failed (${coinId}):`,
+        fallbackError.response?.status || fallbackError.message
+      );
     }
-  }
 
-  return null;
+    throw error;
+  }
 };

@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useTransition } from "react"; // ✅ import
+
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import Header from "../component/Common/Header";
@@ -20,47 +21,135 @@ function CoinPage() {
 
   const [coinData, setCoinData] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const [isChartLoading, setIsChartLoading] = useState(false);
+
   const [days, setDays] = useState(30);
   const [priceType, setPriceType] = useState("prices");
-  const [chartData, setChartData] = useState({ labels: [], datasets: [] });
 
-  const [isPending, startTransition] = useTransition(); 
+  const [chartData, setChartData] = useState({
+    labels: [],
+    datasets: [],
+  });
 
+  const options = {
+  responsive: true,
+  stacked: false,
+  scales: {
+    crypto1: {
+      type: 'linear',
+      display: true,
+      position: 'left',
+    },
+    crypto2: {
+      type: 'linear',
+      display: true,
+      position: 'right',
+      grid: {
+        drawOnChartArea: false, // Prevents grid lines from overlapping
+      },
+    },
+  },
+};
+
+  // Remove duplicate dates from chart data
+  const removeDuplicateDates = (prices) => {
+    if (!Array.isArray(prices)) return [];
+
+    const dateMap = new Map();
+
+    prices.forEach((price) => {
+      const dateStr = ConvertDate(price[0]);
+      const timestamp = price[0];
+
+      if (
+        !dateMap.has(dateStr) ||
+        timestamp > dateMap.get(dateStr)[0]
+      ) {
+        dateMap.set(dateStr, price);
+      }
+    });
+
+    return Array.from(dateMap.values()).sort(
+      (a, b) => a[0] - b[0]
+    );
+  };
+
+  // Fetch coin details only when coinId changes
   useEffect(() => {
     let isMounted = true;
 
-    async function fetchData() {
+    const fetchCoinData = async () => {
+      setIsLoading(true);
+
       try {
-        setIsLoading(true);
         const data = await getCoinData(coinId);
+
         if (!isMounted) return;
 
         if (data) {
           coinObject(setCoinData, data);
-
-          const prices = await getCoinPrices(coinId, days, priceType);
-          if (!isMounted) return;
-
-          if (prices && Array.isArray(prices) && prices.length > 0) {
-            const uniquePrices = removeDuplicateDates(prices);
-            if (uniquePrices.length > 0) {
-              settingChartData({ setChartData, prices1: uniquePrices });
-            } else {
-              console.warn("No unique prices after filtering duplicates");
-            }
-          } else {
-            console.warn("No valid prices data received:", prices);
-          }
+        } else {
+          setCoinData(undefined);
         }
       } catch (error) {
-        console.error("Error in fetchData:", error);
+        console.error("Error fetching coin details:", error);
       } finally {
-        if (isMounted) setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
-    }
+    };
 
     if (coinId) {
-      fetchData();
+      fetchCoinData();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [coinId]);
+
+  // Fetch chart data when coinId, days or priceType changes
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchChartData = async () => {
+      setIsChartLoading(true);
+
+      try {
+        const prices = await getCoinPrices(
+          coinId,
+          days,
+          priceType
+        );
+
+        if (!isMounted) return;
+
+        const uniquePrices = removeDuplicateDates(prices);
+
+        if (uniquePrices.length > 0) {
+          settingChartData({
+            setChartData,
+            prices1: uniquePrices,
+          });
+        } else {
+          setChartData({
+            labels: [],
+            datasets: [],
+          });
+          console.warn("No valid chart data received");
+        }
+      } catch (error) {
+        console.error("Error fetching chart data:", error);
+      } finally {
+        if (isMounted) {
+          setIsChartLoading(false);
+        }
+      }
+    };
+
+    if (coinId) {
+      fetchChartData();
     }
 
     return () => {
@@ -68,67 +157,21 @@ function CoinPage() {
     };
   }, [coinId, days, priceType]);
 
-  const removeDuplicateDates = (prices) => {
-    if (!prices || !Array.isArray(prices)) return [];
-    const dateMap = new Map();
-    prices.forEach((price) => {
-      const dateStr = ConvertDate(price[0]);
-      const timestamp = price[0];
-      if (!dateMap.has(dateStr) || timestamp > dateMap.get(dateStr)[0]) {
-        dateMap.set(dateStr, price);
-      }
-    });
-    return Array.from(dateMap.values()).sort((a, b) => a[0] - b[0]);
+  // Only update state here. useEffect handles API requests.
+  const handleDaysChange = (event) => {
+    setDays(Number(event.target.value));
   };
 
-  const handleDaysChange = async (event) => {
-    const selectedDays = event.target.value;
-    setDays(selectedDays);
-
-    startTransition(async () => { 
-      setIsLoading(true);
-      try {
-        const prices = await getCoinPrices(coinId, selectedDays, priceType);
-        const uniquePrices = removeDuplicateDates(prices);
-        if (uniquePrices.length > 0) {
-          settingChartData({ setChartData, prices1: uniquePrices });
-        } else {
-          console.warn("No unique prices after filtering");
-        }
-      } catch (error) {
-        console.error("Error in handleDaysChange:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    });
-  };
-
-  const handlePriceTypeChange = async (event, newType) => {
+  const handlePriceTypeChange = (event, newType) => {
     if (newType) {
-      setPriceType(newType); 
-
-      startTransition(async () => {
-        setIsLoading(true);
-        try {
-          const prices = await getCoinPrices(coinId, days, newType);
-          const uniquePrices = removeDuplicateDates(prices);
-          if (uniquePrices.length > 0) {
-            settingChartData({ setChartData, prices1: uniquePrices });
-          } else {
-            console.warn("No unique prices for selected price type");
-          }
-        } catch (error) {
-          console.error("Error in handlePriceTypeChange:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      });
+      setPriceType(newType);
     }
   };
 
   return (
     <div>
       <Header />
+
       {isLoading || !coinData ? (
         <Loader />
       ) : (
@@ -142,17 +185,31 @@ function CoinPage() {
           </div>
 
           <div className="gray-wrapper">
-            <SelectDays days={days} handleDaysChange={handleDaysChange} />
-            <Pricetype priceType={priceType} handlePriceTypeChange={handlePriceTypeChange} />
+            <SelectDays
+              days={days}
+              handleDaysChange={handleDaysChange}
+            />
 
-            {isPending ? (
-              <Loader />
+            <Pricetype
+              priceType={priceType}
+              handlePriceTypeChange={handlePriceTypeChange}
+            />
+
+            {isChartLoading ? (
+              <Loader inline />
             ) : (
-              <LineChart chartData={chartData} multiAxis={false} />
+              <LineChart
+                chartData={chartData}
+                multiAxis={false}
+                options={options}
+              />
             )}
           </div>
 
-          <CoinInfo heading={coinData.name} desc={coinData.desc} />
+          <CoinInfo
+            heading={coinData.name}
+            desc={coinData.desc}
+          />
         </>
       )}
     </div>

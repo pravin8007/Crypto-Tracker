@@ -14,6 +14,7 @@ function DashboardPage() {
   const [paginatedCoins, setPaginatedCoins] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const [page, setPage] = useState(1);
   const handlePageChange = (event, value) => {
@@ -41,13 +42,19 @@ function DashboardPage() {
   }, []);
 
   const getData = async () => {
-    const myCoins = await get100coins();
-    if (myCoins) {
+    try {
+      const myCoins = await get100coins();
       setCoins(myCoins);
-      setLoading(false);
       setPaginatedCoins(myCoins.slice(0, 10));
+      setError(myCoins.length === 0 ? "Unable to load coin data." : "");
+    } catch (requestError) {
+      console.error("Dashboard coin request failed:", requestError);
+      setCoins([]);
+      setPaginatedCoins([]);
+      setError("Unable to load coin data.");
+    } finally {
+      setLoading(false);
     }
-
   }
 
   return (
@@ -59,13 +66,19 @@ function DashboardPage() {
         ) :
           (
             <div className="dashboard">
-              <Search search={search} onSeacrhChange={onSearchChange} />
-              <TabsComponent coins={search ? filteredCoins : paginatedCoins} search={search ? search : ""} clearSearch={clearSearch} />
-              {
-                !search && (
-                  <PaginationControl page={page} handlePageChange={handlePageChange} />
-                )
-              }
+              {error ? (
+                <h4 style={{ color: "var(--white)", textAlign: "center" }}>{error}</h4>
+              ) : (
+                <>
+                  <Search search={search} onSeacrhChange={onSearchChange} />
+                  <TabsComponent coins={search ? filteredCoins : paginatedCoins} search={search ? search : ""} clearSearch={clearSearch} />
+                  {
+                    !search && (
+                      <PaginationControl page={page} handlePageChange={handlePageChange} />
+                    )
+                  }
+                </>
+              )}
               <BackToTop />
             </div>
           )

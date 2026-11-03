@@ -2,9 +2,9 @@ import React from 'react';
 import "./styles.css"
 import { CircularProgress } from '@mui/material';
 
-const Loader = () => {
+const Loader = ({ inline = false }) => {
     return (
-        <div className="loader-container">
+        <div className={`loader-container${inline ? " loader-inline" : ""}`}>
            <CircularProgress />
         </div>
     );
