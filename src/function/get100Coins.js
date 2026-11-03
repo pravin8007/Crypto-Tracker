@@ -5,7 +5,7 @@ let cachedCoins = null;
 let cachedTimestamp = 0;
 let fetchPromise = null;
 
-export const CACHE_DURATION = 60 * 5 * 1000; // 
+export const CACHE_DURATION = 60 * 10 * 1000; 
 const STORAGE_KEY = "crypto-tracker:coins";
 
 const readStoredCoins = () => {

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const VALID_PRICE_TYPES = ["prices", "market_caps", "total_volumes"];
-const CACHE_DURATION = 60 * 5 * 1000; // 
+const CACHE_DURATION = 60 * 10 * 1000; 
 const cacheKey = (coinId, days) => `crypto-tracker:prices:${coinId}:${days}`;
 const pendingRequests = new Map();
 

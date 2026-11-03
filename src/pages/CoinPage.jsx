@@ -14,7 +14,6 @@ import { getCoinData } from "../function/getCoinData";
 import { getCoinPrices } from "../function/getCoinPrices";
 import { settingChartData } from "../function/settingChartData";
 import { coinObject } from "../function/convertObject";
-import { ConvertDate } from "../function/convertDate";
 
 function CoinPage() {
   const { coinId } = useParams();
@@ -30,49 +29,6 @@ function CoinPage() {
     labels: [],
     datasets: [],
   });
-
-  const options = {
-  responsive: true,
-  stacked: false,
-  scales: {
-    crypto1: {
-      type: 'linear',
-      display: true,
-      position: 'left',
-    },
-    crypto2: {
-      type: 'linear',
-      display: true,
-      position: 'right',
-      grid: {
-        drawOnChartArea: false, // Prevents grid lines from overlapping
-      },
-    },
-  },
-};
-
-  // Remove duplicate dates from chart data
-  const removeDuplicateDates = (prices) => {
-    if (!Array.isArray(prices)) return [];
-
-    const dateMap = new Map();
-
-    prices.forEach((price) => {
-      const dateStr = ConvertDate(price[0]);
-      const timestamp = price[0];
-
-      if (
-        !dateMap.has(dateStr) ||
-        timestamp > dateMap.get(dateStr)[0]
-      ) {
-        dateMap.set(dateStr, price);
-      }
-    });
-
-    return Array.from(dateMap.values()).sort(
-      (a, b) => a[0] - b[0]
-    );
-  };
 
   // Fetch coin details only when coinId changes
   useEffect(() => {
@@ -125,12 +81,10 @@ function CoinPage() {
 
         if (!isMounted) return;
 
-        const uniquePrices = removeDuplicateDates(prices);
-
-        if (uniquePrices.length > 0) {
+        if (prices.length > 0) {
           settingChartData({
             setChartData,
-            prices1: uniquePrices,
+            prices1: prices,
           });
         } else {
           setChartData({
@@ -141,6 +95,12 @@ function CoinPage() {
         }
       } catch (error) {
         console.error("Error fetching chart data:", error);
+        if (isMounted) {
+          setChartData({
+            labels: [],
+            datasets: [],
+          });
+        }
       } finally {
         if (isMounted) {
           setIsChartLoading(false);
@@ -201,7 +161,7 @@ function CoinPage() {
               <LineChart
                 chartData={chartData}
                 multiAxis={false}
-                options={options}
+                priceType={priceType}
               />
             )}
           </div>
